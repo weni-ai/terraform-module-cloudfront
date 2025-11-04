@@ -20,10 +20,9 @@ resource "aws_cloudfront_distribution" "this" {
   http_version        = "http2"
   default_root_object = var.default_root_object
 
-  # CORREÇÃO 1: Adição do bloco 'restrictions' (OBRIGATÓRIO)
   restrictions {
     geo_restriction {
-      restriction_type = "none" # Acesso global para Web Channel
+      restriction_type = "none"
     }
   }
 
