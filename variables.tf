@@ -16,10 +16,10 @@ variable "price_class" {
   default     = "PriceClass_100"
 }
 
-variable "default_root_object" {
-  description = "Objeto raiz padrão (ex: index.html)."
+variable "error_page_path" {
+  description = "Caminho do objeto (path) que o CloudFront deve retornar em caso de erros 4xx (ex: /404.html)."
   type        = string
-  default     = null
+  default     = "/404.html"
 }
 
 variable "acm_certificate_arn" {
@@ -34,19 +34,25 @@ variable "aliases" {
   default     = []
 }
 
+variable "tags" {
+  description = "Mapa de tags a serem aplicadas à distribuição CloudFront e recursos associados."
+  type        = map(string)
+  default     = {}
+}
+
 variable "origins" {
   description = "Lista de buckets S3 a serem usados como origins."
   type = list(object({
-    id                     = string
-    domain_name             = string
-    path                    = optional(string)
-    origin_access_control   = optional(bool, false)
-    origin_access_identity  = optional(string)
+    id                        = string
+    domain_name               = string
+    path                      = optional(string)
+    origin_access_control     = optional(bool, false)
+    origin_access_identity    = optional(string)
   }))
 }
 
 variable "default_cache_behavior" {
-  description = "Configuração de comportamento padrão de cache."
+  description = "Configuração de comportamento padrão de cache (catch-all)."
   type = object({
     target_origin_id       = string
     viewer_protocol_policy = string
@@ -62,7 +68,7 @@ variable "default_cache_behavior" {
 }
 
 variable "ordered_cache_behaviors" {
-  description = "Lista opcional de cache behaviors adicionais."
+  description = "Lista de cache behaviors adicionais para roteamento por prefixo."
   type = list(object({
     path_pattern           = string
     target_origin_id       = string

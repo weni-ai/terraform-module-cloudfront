@@ -18,7 +18,6 @@ resource "aws_cloudfront_distribution" "this" {
   price_class         = var.price_class
   is_ipv6_enabled     = true
   http_version        = "http2"
-  default_root_object = var.default_root_object
 
   restrictions {
     geo_restriction {
@@ -58,7 +57,6 @@ resource "aws_cloudfront_distribution" "this" {
     }
   }
 
-  # Comportamento padrão de cache
   default_cache_behavior {
     target_origin_id       = var.default_cache_behavior.target_origin_id
     viewer_protocol_policy = var.default_cache_behavior.viewer_protocol_policy
@@ -76,9 +74,7 @@ resource "aws_cloudfront_distribution" "this" {
       }
     }
   }
-
-  # Cache Behaviors adicionais (opcionais)
-  dynamic "ordered_cache_behavior" {
+   dynamic "ordered_cache_behavior" {
     for_each = var.ordered_cache_behaviors
     content {
       path_pattern           = ordered_cache_behavior.value.path_pattern
@@ -97,6 +93,20 @@ resource "aws_cloudfront_distribution" "this" {
     }
   }
 
+  custom_error_response {
+    error_code         = 404
+    response_code      = 404
+    response_page_path = var.error_page_path
+    error_caching_min_ttl = 300
+  }
+  
+  custom_error_response {
+    error_code         = 403
+    response_code      = 403
+    response_page_path = var.error_page_path
+    error_caching_min_ttl = 300
+  }
+
   # Logging (opcional)
   dynamic "logging_config" {
     for_each = var.logging_config != null ? [var.logging_config] : []
@@ -107,5 +117,6 @@ resource "aws_cloudfront_distribution" "this" {
     }
   }
 
+  tags = var.tags
   aliases = var.aliases
 }
